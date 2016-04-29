@@ -16,7 +16,7 @@ import com.facebook.login.LoginResult;
  *
  * Created by mona on 4/29/16.
  */
-public class SplashActivity extends Activity implements LoginFragment.LoginListener{
+public class SplashActivity extends Activity implements LoginFragment.LoginListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
