@@ -3,7 +3,7 @@
 
     <!-- Strings related to login -->
     <string name="login">Login</string>
-    <string name="skip_login">Proceed without login</string>
+    <string name="unable_to_login">Unable to login to fb</string>
 
     <!-- Fb sdk strings -->
     <string name="facebook_app_id">1008042499278780</string>

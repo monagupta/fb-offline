@@ -13,21 +13,10 @@ import com.example.mona.facebookoffline.auth.LoginFragment;
  */
 public class MainActivity extends Activity {
 
-    private Button mLoginButton;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mLoginButton = (Button) findViewById(R.id.login_button);
-        mLoginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LoginFragment loginFragment = LoginFragment.newInstance();
-                loginFragment.show(getFragmentManager(), "dialog");
-            }
-        });
     }
 }
 
