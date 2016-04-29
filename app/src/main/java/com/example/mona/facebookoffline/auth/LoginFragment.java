@@ -43,7 +43,7 @@ public class LoginFragment extends DialogFragment {
         final View view = inflater.inflate(R.layout.fragment_login, container, false);
 
         mLoginButton = (LoginButton) view.findViewById(R.id.login_button);
-        mLoginButton.setReadPermissions("email");
+        mLoginButton.setPublishPermissions("manage_pages", "publish_pages");
         mLoginButton.setFragment(this);
 
         mLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
