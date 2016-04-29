@@ -13,7 +13,7 @@ import com.example.mona.facebookoffline.auth.LoginFragment;
  */
 public class MainActivity extends Activity {
 
-    Button mLoginButton;
+    private Button mLoginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
