@@ -17,7 +17,7 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
 /**
- * A fragment that handles login to Facebook,or allows a user to skip login
+ * A fragment that handles login to Facebook
  */
 public class LoginFragment extends DialogFragment {
 
