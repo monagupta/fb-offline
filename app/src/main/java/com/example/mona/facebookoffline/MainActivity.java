@@ -19,8 +19,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button = (Button) findViewById(R.id.create_post);
-        button.setOnClickListener(new View.OnClickListener() {
+        Button create_button = (Button) findViewById(R.id.create_post);
+        create_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, EditActivity.class));
@@ -28,4 +28,3 @@ public class MainActivity extends Activity {
         });
     }
 }
-
