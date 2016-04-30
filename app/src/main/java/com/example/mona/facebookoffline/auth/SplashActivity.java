@@ -22,9 +22,11 @@ public class SplashActivity extends Activity implements LoginFragment.LoginListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+
         if (isLoggedIn()) {
             launchMainActivityAndFinish();
+        } else {
+            setContentView(R.layout.activity_splash);
         }
     }
 
