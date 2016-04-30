@@ -9,4 +9,10 @@
     <string name="facebook_app_id">1008042499278780</string>
 
     <string name="create_post">Create post</string>
+
+    <string name="post_text">Post Text</string>
+    <string name="post_title">Post Title</string>
+
+    <string name="edit_post_button">Post!</string>
+    <string name="edit_save_button">Save</string>
 </resources>
