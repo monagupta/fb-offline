@@ -36,19 +36,30 @@ public class FacebookApiService {
 
                     @Override
                     public void onCompleted(GraphResponse response) {
-                        Log.d(TAG, "Response: " + response);
-                        try {
-                            String pageToken = response.getJSONObject().getString(ACCESS_TOKEN);
-                            Log.d(TAG, "pageToken=" + pageToken);
 
-                            executeRequestToPost(pageId, pageToken, message, cb);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        if (response.getError() != null) {
+                            Log.w(TAG, "Error fetching page access token", response.getError().getException());
+                            notifyError(cb, response);
+                        } else {
+                            try {
+                                String pageToken = response.getJSONObject().getString(ACCESS_TOKEN);
+                                Log.d(TAG, "pageToken=" + pageToken);
+
+                                executeRequestToPost(pageId, pageToken, message, cb);
+                            } catch (JSONException e) {
+                                Log.w(TAG, "Unable to properly parse response: " + response, e);
+                                notifyError(cb, response);
+                            }
                         }
+
                     }
                 }
 
         ).executeAsync();
+    }
+
+    private void notifyError(GraphRequest.Callback cb, GraphResponse response) {
+        cb.onCompleted(response);
     }
 
     private void executeRequestToPost(String pageId, String pageAccessToken, String message,
