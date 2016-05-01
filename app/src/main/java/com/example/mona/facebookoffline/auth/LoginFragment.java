@@ -77,8 +77,6 @@ public class LoginFragment extends DialogFragment {
             throw new ClassCastException(activity.toString() + " must implement LoginListener");
         }
 
-        // Initialize FB sdk
-        FacebookSdk.sdkInitialize(getActivity());
         mCallbackManager = CallbackManager.Factory.create();
     }
 
