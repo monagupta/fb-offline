@@ -52,8 +52,6 @@ public class LoginFragment extends DialogFragment {
             public void onSuccess(LoginResult loginResult) {
                 Log.d(TAG, "Successful login: " + loginResult);
                 if (mLoginListener != null) mLoginListener.onSuccess(loginResult);
-
-                // Retrieve access token for page
             }
 
             @Override

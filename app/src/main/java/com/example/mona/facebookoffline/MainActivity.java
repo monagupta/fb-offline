@@ -7,13 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import javax.inject.Inject;
 
@@ -26,8 +21,6 @@ public class MainActivity extends Activity {
 
     @Inject FacebookApiService mFacebookApiService;
 
-    private Button mCreatePostButton;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,8 +28,8 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
 
-        mCreatePostButton = (Button) findViewById(R.id.create_post);
-        mCreatePostButton.setOnClickListener(new View.OnClickListener() {
+        Button createPostButton = (Button) findViewById(R.id.create_post);
+        createPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Clicked 'Create Post' button");

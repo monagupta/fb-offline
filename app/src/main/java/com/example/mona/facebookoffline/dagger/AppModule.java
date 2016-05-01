@@ -10,7 +10,6 @@ import dagger.Module;
 import dagger.Provides;
 
 /**
- *
  * Module that provides Dagger with the Application
  *
  * Created by mona on 4/29/16.

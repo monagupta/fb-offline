@@ -11,6 +11,8 @@ import com.facebook.HttpMethod;
 import org.json.JSONException;
 
 /**
+ * Singleton class that handles requests to Facebook's Graph Api
+ *
  * Created by mona on 4/29/16.
  */
 public class FacebookApiService {
