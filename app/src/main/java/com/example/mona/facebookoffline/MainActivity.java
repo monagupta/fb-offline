@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -19,6 +20,8 @@ import com.facebook.login.LoginResult;
  */
 public class MainActivity extends Activity implements LoginFragment.LoginListener {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,8 +29,8 @@ public class MainActivity extends Activity implements LoginFragment.LoginListene
         FacebookSdk.sdkInitialize(this);
         setContentView(R.layout.activity_main);
 
-        Button create_button = (Button) findViewById(R.id.create_post);
-        create_button.setOnClickListener(new View.OnClickListener() {
+        Button createPostButton = (Button) findViewById(R.id.create_post);
+        createPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, EditActivity.class));
@@ -37,7 +40,7 @@ public class MainActivity extends Activity implements LoginFragment.LoginListene
 
     @Override
     public void onSuccess(LoginResult loginResult) {
-        launchMainActivityAndFinish();
+        Log.d(TAG, "Successfully logged in: " + loginResult);
     }
 
     @Override
@@ -49,10 +52,5 @@ public class MainActivity extends Activity implements LoginFragment.LoginListene
     private boolean isLoggedIn() {
         // TODO(mona): Is a non-null token enough to say it's valid? Unsure from the docs
         return AccessToken.getCurrentAccessToken() != null;
-    }
-
-    private void launchMainActivityAndFinish() {
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
     }
 }
