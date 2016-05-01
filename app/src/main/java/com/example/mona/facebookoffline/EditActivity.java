@@ -27,8 +27,8 @@ public class EditActivity extends Activity {
         setContentView(R.layout.activity_edit);
 
         mPostBody = (EditText) findViewById(R.id.post_text);
-        Button save_button = (Button) findViewById(R.id.save_button);
-        save_button.setOnClickListener(new View.OnClickListener() {
+        Button saveButton = (Button) findViewById(R.id.save_button);
+        saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
