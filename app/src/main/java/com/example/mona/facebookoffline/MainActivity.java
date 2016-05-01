@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import javax.inject.Inject;
 import com.example.mona.facebookoffline.auth.LoginFragment;
 import com.facebook.AccessToken;
 import com.facebook.FacebookException;
@@ -21,13 +20,9 @@ public class MainActivity extends Activity implements LoginFragment.LoginListene
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    @Inject FacebookApiService mFacebookApiService;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((FacebookOfflineApp) getApplication()).getAppComponent().inject(this);
-
         setContentView(R.layout.activity_main);
 
         Button create_button = (Button) findViewById(R.id.create_post);
