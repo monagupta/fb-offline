@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import com.example.mona.facebookoffline.MainActivity;
 import com.example.mona.facebookoffline.R;
+import com.facebook.AccessToken;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 
@@ -21,18 +22,32 @@ public class SplashActivity extends Activity implements LoginFragment.LoginListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+
+        if (isLoggedIn()) {
+            launchMainActivityAndFinish();
+        } else {
+            setContentView(R.layout.activity_splash);
+        }
     }
 
     @Override
     public void onSuccess(LoginResult loginResult) {
-        // Launch MainActivity
-        startActivity(new Intent(this, MainActivity.class));
+        launchMainActivityAndFinish();
     }
 
     @Override
     public void onError(FacebookException error) {
         // Display a toast to the user
         Toast.makeText(this, R.string.unable_to_login, Toast.LENGTH_SHORT).show();
+    }
+
+    private boolean isLoggedIn() {
+        // TODO(mona): Is a non-null token enough to say it's valid? Unsure from the docs
+        return AccessToken.getCurrentAccessToken() != null;
+    }
+
+    private void launchMainActivityAndFinish() {
+        startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 }
