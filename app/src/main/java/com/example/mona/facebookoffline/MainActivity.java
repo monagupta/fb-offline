@@ -40,60 +40,16 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Clicked 'Create Post' button");
-
-                // TODO(mona): Remove hardcode or pull into constant
-                Bundle params = new Bundle();
-                params.putString("fields", "access_token");
-
-                new GraphRequest(
-                        AccessToken.getCurrentAccessToken(),
-                        "/" + Constants.PAGE_ID,
-                        params,
-                        HttpMethod.GET,
+                mFacebookApiService.postMessageToPage(Constants.PAGE_ID, "More testing!",
                         new GraphRequest.Callback() {
-
                             @Override
                             public void onCompleted(GraphResponse response) {
                                 Log.d(TAG, "Response: " + response);
-                                try {
-                                    String pageToken = response.getJSONObject().getString("access_token");
-                                    Log.d(TAG, "pageToken=" + pageToken);
-
-                                    fooPost(pageToken);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
                             }
-                        }
+                        });
 
-                ).executeAsync();
             }
         });
-    }
-
-    private void fooPost(String pageAccessToken) {
-
-        Bundle params = new Bundle();
-        params.putString("message", "Testing...");
-
-        // TODO(mona): OMG, this is super hacky. I hate it. Make it stop.
-        AccessToken userToken = AccessToken.getCurrentAccessToken();
-        AccessToken pageToken = new AccessToken(pageAccessToken, userToken.getApplicationId(),
-                userToken.getUserId(), userToken.getPermissions(),
-                userToken.getDeclinedPermissions(), userToken.getSource(),
-                userToken.getExpires(), userToken.getLastRefresh());
-
-        new GraphRequest(
-                pageToken,
-                "/" + Constants.PAGE_ID + "/feed",
-                params,
-                HttpMethod.POST,
-                new GraphRequest.Callback() {
-                    public void onCompleted(GraphResponse response) {
-                        Log.d(TAG, "Response from posting to feed: " + response);
-                    }
-                }
-        ).executeAsync();
     }
 }
 
