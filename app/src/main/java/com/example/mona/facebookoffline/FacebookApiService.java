@@ -1,13 +1,11 @@
 package com.example.mona.facebookoffline;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 
-import com.example.mona.facebookoffline.util.BitmapUtil;
+import com.example.mona.facebookoffline.util.FileUtil;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -16,8 +14,6 @@ import com.facebook.HttpMethod;
 import org.json.JSONException;
 
 import java.io.IOException;
-
-import javax.inject.Inject;
 
 /**
  * Singleton class that handles requests to Facebook's Graph Api
@@ -91,7 +87,7 @@ public class FacebookApiService {
                 // Get data from uri. TODO(mona): Should be done in background
                 byte[] bytes;
                 try {
-                    bytes = BitmapUtil.getBytesFromUri(mContext, uri);
+                    bytes = FileUtil.getBytesFromUri(mContext, uri);
                 } catch (IOException e) {
                     Log.e(TAG, "Unable to get bitmap from uri", e);
                     notifyError(cb, null); // TODO(mona): Pass some info through

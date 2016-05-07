@@ -15,7 +15,6 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -27,8 +26,9 @@ public class EditActivity extends Activity {
 
     private EditText mPostBody;
 
-    // TODO(mona): Need to preserve this variable across instances
-    private List<Uri> mPhotoUris;
+    // Key used for saving mPhotoUris across different instances
+    private static final String PHOTO_URI_LIST = "uris";
+    private ArrayList<Uri> mPhotoUris;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +36,11 @@ public class EditActivity extends Activity {
         ((FacebookOfflineApp) getApplication()).getAppComponent().inject(this);
         setContentView(R.layout.activity_edit);
 
-        mPhotoUris = new ArrayList<>();
+        if (savedInstanceState != null) {
+            mPhotoUris = (ArrayList) savedInstanceState.getSerializable(PHOTO_URI_LIST);
+        } else {
+            mPhotoUris = new ArrayList<>();
+        }
 
         mPostBody = (EditText) findViewById(R.id.post_text);
         Button saveButton = (Button) findViewById(R.id.save_button);
@@ -86,6 +90,14 @@ public class EditActivity extends Activity {
             Log.d(TAG, "Photo uri:" + uri);
         }
         Log.d(TAG, "-------------END---------------");
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // Make sure to call the super method so that the states of our views are saved
+        super.onSaveInstanceState(outState);
+
+        outState.putSerializable(PHOTO_URI_LIST, mPhotoUris);
     }
 
     private void launchPhotoPicker() {

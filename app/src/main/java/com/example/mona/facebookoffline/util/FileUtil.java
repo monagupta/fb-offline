@@ -10,9 +10,8 @@ import java.io.InputStream;
 /**
  * Created by mona on 5/7/16.
  */
-public class BitmapUtil {
+public class FileUtil {
 
-    // TODO(mona): Make non-static and solve through injection instead?
     public static byte[] getBytesFromUri(Context context, Uri uri) throws IOException {
         InputStream inputStream = context.getContentResolver().openInputStream(uri);
         return getBytes(inputStream);
@@ -20,8 +19,7 @@ public class BitmapUtil {
 
     private static byte[] getBytes(InputStream inputStream) throws IOException {
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-        int buffersize = 1024;
-        byte[] buffer =  new byte[buffersize];
+        byte[] buffer =  new byte[1024];
 
         int len = 0;
         while ((len = inputStream.read(buffer)) != -1) {
