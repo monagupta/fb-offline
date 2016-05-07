@@ -13,7 +13,6 @@ import com.example.mona.facebookoffline.R;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
@@ -42,8 +41,10 @@ public class LoginFragment extends DialogFragment {
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_login, container, false);
 
+        mCallbackManager = CallbackManager.Factory.create();
+
         mLoginButton = (LoginButton) view.findViewById(R.id.login_button);
-        mLoginButton.setReadPermissions("email");
+        mLoginButton.setPublishPermissions("manage_pages", "publish_pages");
         mLoginButton.setFragment(this);
 
         mLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
@@ -76,8 +77,6 @@ public class LoginFragment extends DialogFragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement LoginListener");
         }
-
-        mCallbackManager = CallbackManager.Factory.create();
     }
 
     @Override
@@ -93,8 +92,7 @@ public class LoginFragment extends DialogFragment {
     }
 
     public interface LoginListener {
-        public void onSuccess(LoginResult loginResult);
-        public void onError(FacebookException error);
+        void onSuccess(LoginResult loginResult);
+        void onError(FacebookException error);
     }
-
 }

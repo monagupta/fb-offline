@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import com.example.mona.facebookoffline.auth.LoginFragment;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
 import com.facebook.login.LoginResult;
 
 /**
@@ -24,8 +23,6 @@ public class MainActivity extends Activity implements LoginFragment.LoginListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Initialize FB sdk
-        FacebookSdk.sdkInitialize(this);
         setContentView(R.layout.activity_main);
 
         Button createPostButton = (Button) findViewById(R.id.create_post);
