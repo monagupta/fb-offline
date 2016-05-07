@@ -6,11 +6,12 @@ import com.example.mona.facebookoffline.dagger.AppComponent;
 import com.example.mona.facebookoffline.dagger.AppModule;
 import com.example.mona.facebookoffline.dagger.DaggerAppComponent;
 import com.facebook.FacebookSdk;
+import com.orm.SugarApp;
 
 /**
  * Created by mona on 4/29/16.
  */
-public class FacebookOfflineApp extends Application {
+public class FacebookOfflineApp extends SugarApp {
 
     private AppComponent mAppComponent;
 
