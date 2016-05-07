@@ -53,13 +53,17 @@ public class EditActivity extends Activity {
             public void onClick(View v) {
                 Log.d(TAG, "Clicked 'Create Post' button");
                 String msg = mPostBody.getText().toString();
-                mFacebookApiService.postMessageToPage(Constants.PAGE_ID, msg,
-                        new GraphRequest.Callback() {
-                            @Override
-                            public void onCompleted(GraphResponse response) {
-                                Log.d(TAG, "Response: " + response);
-                            }
-                        });
+                GraphRequest.Callback cb = new GraphRequest.Callback() {
+                    @Override
+                    public void onCompleted(GraphResponse response) {
+                        Log.d(TAG, "Response: " + response);
+                    }
+                };
+                if (!mPhotoUris.isEmpty()) {
+                    mFacebookApiService.publishPhotoToPage(Constants.PAGE_ID, null, msg, cb);
+                } else {
+                    mFacebookApiService.postMessageToPage(Constants.PAGE_ID, msg, cb);
+                }
                 finish();
             }
         });
@@ -95,40 +99,45 @@ public class EditActivity extends Activity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == ActivityRequestCode.SELECT_PHOTOS) {
-                if (Intent.ACTION_SEND_MULTIPLE.equals(data.getAction()) && data.hasExtra(Intent.EXTRA_STREAM)) {
-                    // retrieve a collection of selected images
-                    ArrayList<Parcelable> list = data.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
-                    // iterate over these images
-                    if (list != null) {
-                        for (Parcelable parcel : list) {
-                            Uri uri = (Uri) parcel;
-                            // TODO(mona): Is this code path ever triggered? Test Wes's phone
-                            Log.d(TAG, "Selected uri: " + uri);
-                            mPhotoUris.add(uri);
-                        }
-                    }
-                } else {
-                    Uri selectedImageUri = data.getData();
-
-                    if (selectedImageUri != null) {
-                        // For Mona's Moto X 5.1, this code path is triggered when choosing
-                        // a single photo through the Gallery app. Choosing multiple photos
-                        // through the Gallery app is unsupported by Gallery
-                        Log.d(TAG, "Selected single uri: " + selectedImageUri);
-                        mPhotoUris.add(selectedImageUri);
-                    } else {
-                        // Attempt to retrieve Uri using clip data. For Mona's Moto X 5.1, this
-                        // code path is triggered when choosing a single or multiple images through
-                        // the Photos app
-                        ClipData clipData = data.getClipData();
-                        for (int i = 0; i < clipData.getItemCount(); i++) {
-                            Uri clipDataUri = clipData.getItemAt(i).getUri();
-                            if (clipDataUri != null) mPhotoUris.add(clipDataUri);
-                        }
-                    }
-
-                }
+                addUris(data);
             }
         }
     }
+
+    private void addUris(Intent data) {
+        if (Intent.ACTION_SEND_MULTIPLE.equals(data.getAction()) && data.hasExtra(Intent.EXTRA_STREAM)) {
+            // retrieve a collection of selected images
+            ArrayList<Parcelable> list = data.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+            // iterate over these images
+            if (list != null) {
+                for (Parcelable parcel : list) {
+                    Uri uri = (Uri) parcel;
+                    // TODO(mona): Is this code path ever triggered? Test Wes's phone
+                    Log.d(TAG, "Selected uri: " + uri);
+                    mPhotoUris.add(uri);
+                }
+            }
+        } else {
+            Uri selectedImageUri = data.getData();
+
+            if (selectedImageUri != null) {
+                // For Mona's Moto X 5.1, this code path is triggered when choosing
+                // a single photo through the Gallery app. Choosing multiple photos
+                // through the Gallery app is unsupported by Gallery
+                Log.d(TAG, "Selected single uri: " + selectedImageUri);
+                mPhotoUris.add(selectedImageUri);
+            } else {
+                // Attempt to retrieve Uri using clip data. For Mona's Moto X 5.1, this
+                // code path is triggered when choosing a single or multiple images through
+                // the Photos app
+                ClipData clipData = data.getClipData();
+                for (int i = 0; i < clipData.getItemCount(); i++) {
+                    Uri clipDataUri = clipData.getItemAt(i).getUri();
+                    if (clipDataUri != null) mPhotoUris.add(clipDataUri);
+                }
+            }
+
+        }
+    }
+
 }
