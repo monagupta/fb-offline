@@ -9,6 +9,7 @@
         android:allowBackup="true"
         android:name=".FacebookOfflineApp"
         android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
