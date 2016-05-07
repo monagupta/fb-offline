@@ -5,6 +5,7 @@ package com.example.mona.facebookoffline.dagger;
  */
 
 import com.example.mona.facebookoffline.EditActivity;
+import com.example.mona.facebookoffline.FacebookApiService;
 
 import javax.inject.Singleton;
 
@@ -14,4 +15,5 @@ import dagger.Component;
 @Component(modules={AppModule.class})
 public interface AppComponent {
     void inject(EditActivity activity);
+    void inject(FacebookApiService service);
 }

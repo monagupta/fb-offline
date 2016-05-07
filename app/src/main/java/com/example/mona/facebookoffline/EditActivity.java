@@ -60,7 +60,8 @@ public class EditActivity extends Activity {
                     }
                 };
                 if (!mPhotoUris.isEmpty()) {
-                    mFacebookApiService.publishPhotoToPage(Constants.PAGE_ID, null, msg, cb);
+                    mFacebookApiService.publishPhotoToPage(Constants.PAGE_ID,
+                            mPhotoUris.get(0), msg, cb);
                 } else {
                     mFacebookApiService.postMessageToPage(Constants.PAGE_ID, msg, cb);
                 }

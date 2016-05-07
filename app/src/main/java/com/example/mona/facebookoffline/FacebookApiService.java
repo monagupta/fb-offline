@@ -1,15 +1,23 @@
 package com.example.mona.facebookoffline;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 
+import com.example.mona.facebookoffline.util.BitmapUtil;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 
 import org.json.JSONException;
+
+import java.io.IOException;
+
+import javax.inject.Inject;
 
 /**
  * Singleton class that handles requests to Facebook's Graph Api
@@ -23,6 +31,12 @@ public class FacebookApiService {
     private static final String FIELDS = "fields";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String MESSAGE = "message";
+
+    private Context mContext;
+
+    public FacebookApiService(Context context) {
+        mContext = context;
+    }
 
     public void postMessageToPage(final String pageId, final String message,
                                   final GraphRequest.Callback cb) {
@@ -44,14 +58,51 @@ public class FacebookApiService {
                 }, pageId, cb);
     }
 
-    public void publishPhotoToPage(final String pageId, final Uri uri, final String message,
+    public void publishPhotoToPage(final String pageId, final String url, final String message,
                                    final GraphRequest.Callback cb) {
         executeAsPage(new ApiRequest() {
             @Override
             public void execute(AccessToken pageToken) {
                 Bundle params = new Bundle();
-                params.putString("url", "https://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg");
+                params.putString("url", url);
                 params.putString(MESSAGE, message);
+                /* make the API call */
+                new GraphRequest(
+                        pageToken,
+                        "/" + pageId + "/photos",
+                        params,
+                        HttpMethod.POST,
+                        new GraphRequest.Callback() {
+                            public void onCompleted(GraphResponse response) {
+                                cb.onCompleted(response);
+                            }
+                        }
+                ).executeAsync();
+            }
+        }, pageId, cb);
+    }
+
+    public void publishPhotoToPage(final String pageId, final Uri uri, final String message,
+                                   final GraphRequest.Callback cb) {
+        executeAsPage(new ApiRequest() {
+            @Override
+            public void execute(AccessToken pageToken) {
+
+                // Get data from uri. TODO(mona): Should be done in background
+                byte[] bytes;
+                try {
+                    bytes = BitmapUtil.getBytesFromUri(mContext, uri);
+                } catch (IOException e) {
+                    Log.e(TAG, "Unable to get bitmap from uri", e);
+                    notifyError(cb, null); // TODO(mona): Pass some info through
+                    return;
+                }
+
+                Bundle params = new Bundle();
+                params.putString(ACCESS_TOKEN, pageToken.getToken());
+                params.putString(MESSAGE, message);
+                params.putByteArray("picture", bytes);
+
                 /* make the API call */
                 new GraphRequest(
                         pageToken,
