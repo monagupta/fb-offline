@@ -21,7 +21,7 @@ public class EditActivity extends Activity {
 
     private EditText mPostBody;
     private EditText mPostTitle;
-    private Post post;
+    private Post mPost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,14 +31,14 @@ public class EditActivity extends Activity {
 
         Bundle b = getIntent().getExtras();
         if(b == null) {
-            post = new Post();
+            mPost = new Post();
         } else {
-            post = Post.findById(Post.class, b.getInt("id"));
+            mPost = Post.findById(Post.class, b.getInt("id"));
         }
         mPostBody = (EditText) findViewById(R.id.post_text);
         mPostTitle = (EditText) findViewById(R.id.post_title);
-        mPostBody.setText(post.text);
-        mPostTitle.setText(post.title);
+        mPostBody.setText(mPost.text);
+        mPostTitle.setText(mPost.title);
 
         Button saveButton = (Button) findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -70,8 +70,8 @@ public class EditActivity extends Activity {
     }
 
     private void savePost() {
-        post.text = mPostBody.getText().toString();
-        post.title = mPostTitle.getText().toString();
-        post.save();
+        mPost.text = mPostBody.getText().toString();
+        mPost.title = mPostTitle.getText().toString();
+        mPost.save();
     }
 }
