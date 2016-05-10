@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.mona.facebookoffline.models.Post;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 
@@ -19,6 +20,8 @@ public class EditActivity extends Activity {
     @Inject FacebookApiService mFacebookApiService;
 
     private EditText mPostBody;
+    private EditText mPostTitle;
+    private Post mPost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,11 +29,23 @@ public class EditActivity extends Activity {
         ((FacebookOfflineApp) getApplication()).getAppComponent().inject(this);
         setContentView(R.layout.activity_edit);
 
+        Bundle b = getIntent().getExtras();
+        if(b == null) {
+            mPost = new Post();
+        } else {
+            mPost = Post.findById(Post.class, b.getInt("id"));
+        }
         mPostBody = (EditText) findViewById(R.id.post_text);
+        mPostTitle = (EditText) findViewById(R.id.post_title);
+        mPostBody.setText(mPost.text);
+        mPostTitle.setText(mPost.title);
+
         Button saveButton = (Button) findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                savePost();
+
                 finish();
             }
         });
@@ -40,6 +55,7 @@ public class EditActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Clicked 'Create Post' button");
+                savePost();
                 String msg = mPostBody.getText().toString();
                 mFacebookApiService.postMessageToPage(Constants.PAGE_ID, msg,
                         new GraphRequest.Callback() {
@@ -51,5 +67,11 @@ public class EditActivity extends Activity {
                 finish();
             }
         });
+    }
+
+    private void savePost() {
+        mPost.text = mPostBody.getText().toString();
+        mPost.title = mPostTitle.getText().toString();
+        mPost.save();
     }
 }
