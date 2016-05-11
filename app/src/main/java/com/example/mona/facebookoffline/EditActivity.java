@@ -41,7 +41,10 @@ public class EditActivity extends Activity {
 
         if (savedInstanceState != null) {
             mPhotoUris = (ArrayList) savedInstanceState.getSerializable(PHOTO_URI_LIST);
-        } else {
+        }
+
+        // Initialize mPhotoUris if not initialized through the savedInstanceState
+        if (mPhotoUris == null) {
             mPhotoUris = new ArrayList<>();
         }
 
@@ -122,7 +125,7 @@ public class EditActivity extends Activity {
         intent.setAction(Intent.ACTION_GET_CONTENT);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         startActivityForResult(Intent.createChooser(intent,
-                "Select Picture"), ActivityRequestCode.SELECT_PHOTOS);
+                getString(R.string.select_pictures)), ActivityRequestCode.SELECT_PHOTOS);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
