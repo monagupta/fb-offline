@@ -60,17 +60,44 @@ public class EditActivity extends Activity {
         mPostTitle.setText(mPost.title);
 
         Button saveButton = (Button) findViewById(R.id.save_button);
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                savePost();
-
-                finish();
-            }
-        });
+        saveButton.setOnClickListener(getSaveButtonClickListener());
 
         Button postButton = (Button) findViewById(R.id.post_button);
-        postButton.setOnClickListener(new View.OnClickListener() {
+        postButton.setOnClickListener(getPostButtonClickListener());
+
+        Button addPhotosButton = (Button) findViewById(R.id.add_photos_button);
+        addPhotosButton.setOnClickListener(getAddPhotoButtonClickListener());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "-------------Contents of mPhotoUris---------");
+        for (Uri uri : mPhotoUris) {
+            Log.d(TAG, "Photo uri:" + uri);
+        }
+        Log.d(TAG, "-------------END---------------");
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // Make sure to call the super method so that the states of our views are saved
+        super.onSaveInstanceState(outState);
+
+        outState.putSerializable(PHOTO_URI_LIST, mPhotoUris);
+    }
+
+    private View.OnClickListener getAddPhotoButtonClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchPhotoPicker();
+            }
+        };
+    }
+
+    private View.OnClickListener getPostButtonClickListener() {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Clicked 'Create Post' button");
@@ -90,33 +117,18 @@ public class EditActivity extends Activity {
                 }
                 finish();
             }
-        });
+        };
+    }
 
-        Button addPhotosButton = (Button) findViewById(R.id.add_photos_button);
-        addPhotosButton.setOnClickListener(new View.OnClickListener() {
+    private View.OnClickListener getSaveButtonClickListener() {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                launchPhotoPicker();
+                savePost();
+
+                finish();
             }
-        });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "-------------Contents of mPhotoUris---------");
-        for (Uri uri : mPhotoUris) {
-            Log.d(TAG, "Photo uri:" + uri);
-        }
-        Log.d(TAG, "-------------END---------------");
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        // Make sure to call the super method so that the states of our views are saved
-        super.onSaveInstanceState(outState);
-
-        outState.putSerializable(PHOTO_URI_LIST, mPhotoUris);
+        };
     }
 
     private void launchPhotoPicker() {
