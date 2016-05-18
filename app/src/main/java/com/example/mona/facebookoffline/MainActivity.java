@@ -27,6 +27,9 @@ public class MainActivity extends Activity implements LoginFragment.LoginListene
 
         Button createPostButton = (Button) findViewById(R.id.create_post);
         createPostButton.setOnClickListener(getCreatePostButtonListener());
+
+        Button editPostButton = (Button) findViewById(R.id.edit_post);
+        editPostButton.setOnClickListener(getEditPostButtonListener());
     }
 
     @Override
@@ -41,6 +44,15 @@ public class MainActivity extends Activity implements LoginFragment.LoginListene
     }
 
     private View.OnClickListener getCreatePostButtonListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, EditActivity.class));
+            }
+        };
+    }
+
+    private View.OnClickListener getEditPostButtonListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
