@@ -56,7 +56,7 @@ public class MainActivity extends Activity implements LoginFragment.LoginListene
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, EditActivity.class));
+                startActivity(new Intent(MainActivity.this, ChoosePostActivity.class));
             }
         };
     }
