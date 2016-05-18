@@ -5,6 +5,9 @@
     <!-- Necessary to post to fb -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Necessary to access local photos -->
+    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
+
     <application
         android:allowBackup="true"
         android:name=".FacebookOfflineApp"

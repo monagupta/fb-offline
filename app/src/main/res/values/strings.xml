@@ -15,4 +15,6 @@
     <string name="post_title">Post Title</string>
     <string name="edit_post_button">Post!</string>
     <string name="edit_save_button">Save</string>
+    <string name="add_photos">Add photos</string>
+    <string name="select_pictures">Select Pictures</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.example.mona.facebookoffline.dagger;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.example.mona.facebookoffline.FacebookApiService;
 
@@ -18,9 +19,11 @@ import dagger.Provides;
 public class AppModule {
 
     Application mApplication;
+    Context mContext;
 
     public AppModule(Application application) {
         mApplication = application;
+        mContext = application.getApplicationContext();
     }
 
     @Provides
@@ -30,9 +33,14 @@ public class AppModule {
     }
 
     @Provides
+    Context providesContext() {
+        return mContext;
+    }
+
+    @Provides
     @Singleton
-    FacebookApiService provideFacebookApiService() {
-        return new FacebookApiService();
+    FacebookApiService provideFacebookApiService(Context context) {
+        return new FacebookApiService(context);
     }
 
 }
