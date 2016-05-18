@@ -26,12 +26,7 @@ public class MainActivity extends Activity implements LoginFragment.LoginListene
         setContentView(R.layout.activity_main);
 
         Button createPostButton = (Button) findViewById(R.id.create_post);
-        createPostButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, EditActivity.class));
-            }
-        });
+        createPostButton.setOnClickListener(getCreatePostButtonListener());
     }
 
     @Override
@@ -43,5 +38,14 @@ public class MainActivity extends Activity implements LoginFragment.LoginListene
     public void onError(FacebookException error) {
         // Display a toast to the user
         Toast.makeText(this, R.string.unable_to_login, Toast.LENGTH_SHORT).show();
+    }
+
+    private View.OnClickListener getCreatePostButtonListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, EditActivity.class));
+            }
+        };
     }
 }
