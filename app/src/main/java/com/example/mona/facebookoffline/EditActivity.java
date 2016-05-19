@@ -115,6 +115,7 @@ public class EditActivity extends Activity {
                     responseObs = mFacebookApiService.postMessageToPage(Constants.PAGE_ID, msg);
                 }
 
+                // todo: should manage this subscription...
                 responseObs.subscribe(
                         new Subscriber<GraphResponse>() {
                             @Override

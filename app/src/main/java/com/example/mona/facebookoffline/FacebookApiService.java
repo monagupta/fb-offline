@@ -16,8 +16,8 @@ import org.json.JSONException;
 import java.io.IOException;
 
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 import rx.subjects.ReplaySubject;
 
 /**
@@ -32,6 +32,7 @@ public class FacebookApiService {
     private static final String FIELDS = "fields";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String MESSAGE = "message";
+    private static final String URL = "url";
 
     private Context mContext;
 
@@ -48,27 +49,33 @@ public class FacebookApiService {
 
     public Observable<GraphResponse> publishPhotoToPage(final String pageId, final String url, final String message) {
         Bundle params = new Bundle();
-        params.putString("url", url);
+        params.putString(URL, url);
         params.putString(MESSAGE, message);
         String path = "/" + pageId + "/photos";
         return executeAsPage(pageId, path, params, HttpMethod.POST);
     }
 
     public Observable<GraphResponse> publishPhotoToPage(final String pageId, final Uri uri, final String message) {
-        // Get data from uri. TODO(mona): Should be done in background
-        byte[] bytes;
-        try {
-            bytes = FileUtil.getBytesFromUri(mContext, uri);
-        } catch (IOException e) {
-            Log.e(TAG, "Unable to get bitmap from uri", e);
-            return Observable.error(e);
-        }
+        return Observable.just(uri)
+                .subscribeOn(Schedulers.io())
+                .flatMap(new Func1<Uri, Observable<GraphResponse>>() {
+                    @Override
+                    public Observable<GraphResponse> call(Uri uri) {
+                        // Get data from uri in background.
+                        byte[] bytes;
+                        try {
+                            bytes = FileUtil.getBytesFromUri(mContext, uri);
+                        } catch (IOException e) {
+                            Log.e(TAG, "Unable to get bitmap from uri", e);
+                            return Observable.error(e);
+                        }
+                        Bundle params = new Bundle();
+                        params.putString(MESSAGE, message);
+                        params.putByteArray("picture", bytes);
 
-        Bundle params = new Bundle();
-        params.putString(MESSAGE, message);
-        params.putByteArray("picture", bytes);
-
-        return executeAsPage(pageId, "/" + pageId + "/photos", params, HttpMethod.POST);
+                        return executeAsPage(pageId, "/" + pageId + "/photos", params, HttpMethod.POST);
+                    }
+                });
     }
 
     private Observable<GraphResponse> executeAsPage(final String pageId,
@@ -76,7 +83,6 @@ public class FacebookApiService {
                                                     final Bundle parameters,
                                                     final HttpMethod httpMethod) {
         return getPageAccessToken(pageId)
-                .observeOn(AndroidSchedulers.mainThread()) // TODO(mona) Check all threading everywhere
                 .flatMap(new Func1<AccessToken, Observable<GraphResponse>>() {
                     @Override
                     public Observable<GraphResponse> call(AccessToken accessToken) {
