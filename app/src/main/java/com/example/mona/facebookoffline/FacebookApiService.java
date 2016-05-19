@@ -8,7 +8,6 @@ import android.util.Log;
 import com.example.mona.facebookoffline.util.FileUtil;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
-import com.facebook.GraphRequestAsyncTask;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 
@@ -17,11 +16,8 @@ import org.json.JSONException;
 import java.io.IOException;
 
 import rx.Observable;
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func0;
 import rx.functions.Func1;
-import rx.subjects.PublishSubject;
 import rx.subjects.ReplaySubject;
 
 /**
@@ -69,7 +65,6 @@ public class FacebookApiService {
         }
 
         Bundle params = new Bundle();
-        //params.putString(ACCESS_TOKEN, pageToken.getToken()); TODO(mona): Is this really necessary? :(
         params.putString(MESSAGE, message);
         params.putByteArray("picture", bytes);
 
