@@ -52,7 +52,7 @@ public class EditActivity extends Activity {
         if(b == null) {
             mPost = new Post();
         } else {
-            mPost = Post.findById(Post.class, b.getInt("id"));
+            mPost = Post.findById(Post.class, b.getLong("id"));
         }
         mPostBody = (EditText) findViewById(R.id.post_text);
         mPostTitle = (EditText) findViewById(R.id.post_title);

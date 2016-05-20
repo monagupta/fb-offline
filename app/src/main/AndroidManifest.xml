@@ -43,6 +43,10 @@
         <activity
             android:name=".EditActivity"
             android:label="@string/app_name" />
+
+        <activity
+            android:name=".ChoosePostActivity"
+            android:label="@string/app_name" />
     </application>
 
 </manifest>
