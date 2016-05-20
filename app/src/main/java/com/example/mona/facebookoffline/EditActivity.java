@@ -12,18 +12,21 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.mona.facebookoffline.models.Post;
-import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 
 import java.util.ArrayList;
 
 import javax.inject.Inject;
 
+import rx.Observable;
+import rx.Subscriber;
+
 public class EditActivity extends Activity {
 
     private static final String TAG = EditActivity.class.getSimpleName();
 
-    @Inject FacebookApiService mFacebookApiService;
+    @Inject
+    FacebookApiService mFacebookApiService;
 
     private EditText mPostBody;
     private EditText mPostTitle;
@@ -49,7 +52,7 @@ public class EditActivity extends Activity {
         }
 
         Bundle b = getIntent().getExtras();
-        if(b == null) {
+        if (b == null) {
             mPost = new Post();
         } else {
             mPost = Post.findById(Post.class, b.getLong("id"));
@@ -103,18 +106,34 @@ public class EditActivity extends Activity {
                 Log.d(TAG, "Clicked 'Create Post' button");
                 savePost();
                 String msg = mPostBody.getText().toString();
-                GraphRequest.Callback cb = new GraphRequest.Callback() {
-                    @Override
-                    public void onCompleted(GraphResponse response) {
-                        Log.d(TAG, "Response: " + response);
-                    }
-                };
+
+                Observable<GraphResponse> responseObs;
                 if (!mPhotoUris.isEmpty()) {
-                    mFacebookApiService.publishPhotoToPage(Constants.PAGE_ID,
-                            mPhotoUris.get(0), msg, cb);
+                    responseObs = mFacebookApiService.publishPhotoToPage(Constants.PAGE_ID,
+                            mPhotoUris.get(0), msg);
                 } else {
-                    mFacebookApiService.postMessageToPage(Constants.PAGE_ID, msg, cb);
+                    responseObs = mFacebookApiService.postMessageToPage(Constants.PAGE_ID, msg);
                 }
+
+                // todo: should manage this subscription...
+                responseObs.subscribe(
+                        new Subscriber<GraphResponse>() {
+                            @Override
+                            public void onCompleted() {
+                                // Do nothing
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.w(TAG, "Error posting to Facebook", e);
+                            }
+
+                            @Override
+                            public void onNext(GraphResponse graphResponse) {
+                                Log.d(TAG, "Response: " + graphResponse);
+                            }
+                        });
+
                 finish();
             }
         };

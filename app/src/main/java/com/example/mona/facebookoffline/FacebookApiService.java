@@ -15,6 +15,11 @@ import org.json.JSONException;
 
 import java.io.IOException;
 
+import rx.Observable;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
+import rx.subjects.ReplaySubject;
+
 /**
  * Singleton class that handles requests to Facebook's Graph Api
  *
@@ -27,6 +32,7 @@ public class FacebookApiService {
     private static final String FIELDS = "fields";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String MESSAGE = "message";
+    private static final String URL = "url";
 
     private Context mContext;
 
@@ -34,127 +40,78 @@ public class FacebookApiService {
         mContext = context;
     }
 
-    public void postMessageToPage(final String pageId, final String message,
-                                  final GraphRequest.Callback cb) {
-        executeAsPage(
-                new ApiRequest() {
+    public Observable<GraphResponse> postMessageToPage(final String pageId, final String message) {
+        Bundle params = new Bundle();
+        params.putString(MESSAGE, message);
+        String path = "/" + pageId + "/feed";
+        return executeAsPage(pageId, path, params, HttpMethod.POST);
+    }
+
+    public Observable<GraphResponse> publishPhotoToPage(final String pageId, final String url, final String message) {
+        Bundle params = new Bundle();
+        params.putString(URL, url);
+        params.putString(MESSAGE, message);
+        String path = "/" + pageId + "/photos";
+        return executeAsPage(pageId, path, params, HttpMethod.POST);
+    }
+
+    public Observable<GraphResponse> publishPhotoToPage(final String pageId, final Uri uri, final String message) {
+        return Observable.just(uri)
+                .subscribeOn(Schedulers.io())
+                .flatMap(new Func1<Uri, Observable<GraphResponse>>() {
                     @Override
-                    public void execute(AccessToken pageToken) {
+                    public Observable<GraphResponse> call(Uri uri) {
+                        // Get data from uri in background.
+                        byte[] bytes;
+                        try {
+                            bytes = FileUtil.getBytesFromUri(mContext, uri);
+                        } catch (IOException e) {
+                            Log.e(TAG, "Unable to get bitmap from uri", e);
+                            return Observable.error(e);
+                        }
                         Bundle params = new Bundle();
                         params.putString(MESSAGE, message);
+                        params.putByteArray("picture", bytes);
 
-                        new GraphRequest(
-                                pageToken,
-                                "/" + pageId + "/feed",
-                                params,
-                                HttpMethod.POST,
-                                cb
-                        ).executeAsync();
+                        return executeAsPage(pageId, "/" + pageId + "/photos", params, HttpMethod.POST);
                     }
-                }, pageId, cb);
+                });
     }
 
-    public void publishPhotoToPage(final String pageId, final String url, final String message,
-                                   final GraphRequest.Callback cb) {
-        executeAsPage(new ApiRequest() {
-            @Override
-            public void execute(AccessToken pageToken) {
-                Bundle params = new Bundle();
-                params.putString("url", url);
-                params.putString(MESSAGE, message);
-                /* make the API call */
-                new GraphRequest(
-                        pageToken,
-                        "/" + pageId + "/photos",
-                        params,
-                        HttpMethod.POST,
-                        new GraphRequest.Callback() {
-                            public void onCompleted(GraphResponse response) {
-                                cb.onCompleted(response);
-                            }
-                        }
-                ).executeAsync();
-            }
-        }, pageId, cb);
+    private Observable<GraphResponse> executeAsPage(final String pageId,
+                                                    final String graphPath,
+                                                    final Bundle parameters,
+                                                    final HttpMethod httpMethod) {
+        return getPageAccessToken(pageId)
+                .flatMap(new Func1<AccessToken, Observable<GraphResponse>>() {
+                    @Override
+                    public Observable<GraphResponse> call(AccessToken accessToken) {
+                        return execute(accessToken, graphPath, parameters, httpMethod);
+                    }
+                });
     }
 
-    public void publishPhotoToPage(final String pageId, final Uri uri, final String message,
-                                   final GraphRequest.Callback cb) {
-        executeAsPage(new ApiRequest() {
-            @Override
-            public void execute(AccessToken pageToken) {
-
-                // Get data from uri. TODO(mona): Should be done in background
-                byte[] bytes;
-                try {
-                    bytes = FileUtil.getBytesFromUri(mContext, uri);
-                } catch (IOException e) {
-                    Log.e(TAG, "Unable to get bitmap from uri", e);
-                    notifyError(cb, null); // TODO(mona): Pass some info through
-                    return;
-                }
-
-                Bundle params = new Bundle();
-                params.putString(ACCESS_TOKEN, pageToken.getToken());
-                params.putString(MESSAGE, message);
-                params.putByteArray("picture", bytes);
-
-                /* make the API call */
-                new GraphRequest(
-                        pageToken,
-                        "/" + pageId + "/photos",
-                        params,
-                        HttpMethod.POST,
-                        new GraphRequest.Callback() {
-                            public void onCompleted(GraphResponse response) {
-                                cb.onCompleted(response);
-                            }
-                        }
-                ).executeAsync();
-            }
-        }, pageId, cb);
-    }
-
-    private void notifyError(GraphRequest.Callback cb, GraphResponse response) {
-        cb.onCompleted(response);
-    }
-
-    private void executeAsPage(final ApiRequest request, final String pageId,
-                               final GraphRequest.Callback cb) {
+    private Observable<AccessToken> getPageAccessToken(final String pageId) {
         Bundle params = new Bundle();
         params.putString(FIELDS, ACCESS_TOKEN);
 
         // TODO(mona): Currently we're requesting a page token every time, which is probably not necessary
-        new GraphRequest(
-                AccessToken.getCurrentAccessToken(),
-                "/" + pageId,
-                params,
-                HttpMethod.GET,
-                new GraphRequest.Callback() {
-
+        return execute(AccessToken.getCurrentAccessToken(), "/" + pageId, params, HttpMethod.GET)
+                .map(new Func1<GraphResponse, AccessToken>() {
                     @Override
-                    public void onCompleted(GraphResponse response) {
-
-                        if (response.getError() != null) {
-                            Log.w(TAG, "Error fetching page access token", response.getError().getException());
-                            notifyError(cb, response);
-                        } else {
-                            try {
-                                String pageToken = response.getJSONObject().getString(ACCESS_TOKEN);
-                                Log.d(TAG, "pageToken=" + pageToken);
-                                // Convert String representation to an AccessToken instance
-                                AccessToken token = createAccessToken(pageToken,
-                                        AccessToken.getCurrentAccessToken());
-                                request.execute(token);
-                            } catch (JSONException e) {
-                                Log.w(TAG, "Unable to properly parse response: " + response, e);
-                                notifyError(cb, response);
-                            }
+                    public AccessToken call(GraphResponse graphResponse) {
+                        try {
+                            String pageToken = graphResponse.getJSONObject().getString(ACCESS_TOKEN);
+                            Log.d(TAG, "pageToken=" + pageToken);
+                            // Convert String representation to an AccessToken instance
+                            return createAccessToken(pageToken,
+                                    AccessToken.getCurrentAccessToken());
+                        } catch (JSONException e) {
+                            Log.w(TAG, "Unable to properly parse response: " + graphResponse, e);
+                            return null;
                         }
-
                     }
-                }
-        ).executeAsync();
+                });
     }
 
     private AccessToken createAccessToken(String newTokenString, AccessToken modelToken) {
@@ -165,7 +122,29 @@ public class FacebookApiService {
                 modelToken.getExpires(), modelToken.getLastRefresh());
     }
 
-    private interface ApiRequest {
-        void execute(AccessToken pageToken);
+    private Observable<GraphResponse> execute(AccessToken accessToken,
+                                      String graphPath,
+                                      Bundle parameters,
+                                      HttpMethod httpMethod) {
+        final ReplaySubject<GraphResponse> obs = ReplaySubject.createWithSize(1);
+        new GraphRequest(
+                accessToken,
+                graphPath,
+                parameters,
+                httpMethod,
+                new GraphRequest.Callback() {
+                    @Override
+                    public void onCompleted(GraphResponse response) {
+                        if (response.getError() != null) {
+                            obs.onError(response.getError().getException());
+                        } else {
+                            obs.onNext(response);
+                            obs.onCompleted();
+                        }
+                    }
+                }
+        ).executeAsync();
+
+        return obs;
     }
 }

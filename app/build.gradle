@@ -35,4 +35,9 @@ dependencies {
     compile 'com.google.dagger:dagger:2.2'
     provided 'javax.annotation:jsr250-api:1.0'
     compile 'com.github.satyan:sugar:1.4'
+
+    // RxAndroid. Because RxAndroid releases are few and far between, it is recommended to also
+    // explicitly depend on RxJava's latest version for bug fixes and new features.
+    compile 'io.reactivex:rxandroid:1.2.0'
+    compile 'io.reactivex:rxjava:1.1.5'
 }
